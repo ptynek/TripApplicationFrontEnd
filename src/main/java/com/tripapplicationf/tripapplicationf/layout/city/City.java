@@ -8,6 +8,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Bean;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,19 +17,14 @@ import java.util.List;
 @PageTitle("Cities || Vaadin")
 public class City extends VerticalLayout {
 
-
-    @Autowired
     private TripApplicationClient client;
 
     public City() {
-
         buildGrid();
 
     }
 
     private void buildGrid() {
-
-        List<CitiesDto> list = client.getCitiesDto();
 
         Grid<CitiesDto> grid = new Grid<>();
 
@@ -37,7 +33,7 @@ public class City extends VerticalLayout {
         grid.addColumn(CitiesDto::getLatitude).setHeader("Latitude").setAutoWidth(true);
         grid.addColumn(CitiesDto::getLongitude).setHeader("Longitude").setAutoWidth(true);
 
-        grid.setItems(list);
+        grid.setItems(client.getCitiesDto());
 
         add(grid);
     }
