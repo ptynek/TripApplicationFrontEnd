@@ -17,6 +17,7 @@ import java.util.List;
 @PageTitle("Cities || Vaadin")
 public class City extends VerticalLayout {
 
+    @Autowired
     private TripApplicationClient client;
 
     public City() {
@@ -28,12 +29,14 @@ public class City extends VerticalLayout {
 
         Grid<CitiesDto> grid = new Grid<>();
 
+        List<CitiesDto> list = client.getCitiesDto();
+
         grid.addColumn(CitiesDto::getCity).setHeader("City").setAutoWidth(true);
         grid.addColumn(CitiesDto::getCountry).setHeader("Country").setAutoWidth(true);
         grid.addColumn(CitiesDto::getLatitude).setHeader("Latitude").setAutoWidth(true);
         grid.addColumn(CitiesDto::getLongitude).setHeader("Longitude").setAutoWidth(true);
 
-        grid.setItems(client.getCitiesDto());
+        grid.setItems(list);
 
         add(grid);
     }

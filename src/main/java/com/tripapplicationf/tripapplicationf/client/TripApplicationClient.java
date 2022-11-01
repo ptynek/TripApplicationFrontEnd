@@ -22,9 +22,6 @@ import java.util.stream.Collectors;
 @Slf4j
 public class TripApplicationClient {
 
-    @Value("${app.api.endpoint}")
-    private String endpoint;
-
     private final RestTemplate restTemplate;
 
 
@@ -41,18 +38,16 @@ public class TripApplicationClient {
 
     public List<CitiesDto> getCitiesDto(){
 
-        ResponseEntity<List<CitiesDto>> response =
-                restTemplate.exchange("http://localhost:8080/v1/cities", HttpMethod.GET, null, new ParameterizedTypeReference<List<CitiesDto>>() {
-                });
+        URI url = UriComponentsBuilder.fromHttpUrl("https://trip-application.herokuapp.com/v1/cities")
+                .build()
+                .encode()
+                .toUri();
 
-                List<CitiesDto> list = response.getBody();
+        CitiesDto[] citiesResponse = restTemplate.getForObject(url, CitiesDto[].class);
 
-      /* CitiesList response = restTemplate.getForObject("https://trip-application.herokuapp.com/v1/cities", CitiesList.class);
-
-       List<CitiesDto> resultList = response.getCitiesDtoList();*/
-
-       return list;
-
+        return Optional.ofNullable(citiesResponse)
+                .map(Arrays::asList)
+                .orElse(Collections.emptyList());
     }
 
 }
