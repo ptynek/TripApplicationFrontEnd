@@ -41,7 +41,6 @@ public class TripApplicationClient {
 
     public List<CitiesDto> getCitiesDto(){
 
-        RestTemplate restTemplate = new RestTemplate();
         ResponseEntity<List<CitiesDto>> response =
                 restTemplate.exchange("http://localhost:8080/v1/cities", HttpMethod.GET, null, new ParameterizedTypeReference<List<CitiesDto>>() {
                 });
