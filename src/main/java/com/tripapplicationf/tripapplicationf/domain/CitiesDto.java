@@ -14,5 +14,12 @@ public class CitiesDto {
     private String country;
     private double latitude;
     private double longitude;
+    private boolean active;
 
+    public CitiesDto(String city, String country, double latitude, double longitude) {
+        this.city = city;
+        this.country = country;
+        this.latitude = latitude;
+        this.longitude = longitude;
+    }
 }

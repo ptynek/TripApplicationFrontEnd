@@ -1,6 +1,7 @@
 package com.tripapplicationf.tripapplicationf.layout.route;
 
 import com.tripapplicationf.tripapplicationf.MainView;
+import com.tripapplicationf.tripapplicationf.layout.basiclayout.BasicLayout;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -9,7 +10,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.router.Route;
 
-@Route(value = "/trip", layout = MainView.class)
+@Route(value = "/trip", layout = BasicLayout.class)
 public class Trip extends VerticalLayout {
 
     public Trip() {

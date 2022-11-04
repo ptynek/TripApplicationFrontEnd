@@ -1,121 +1,71 @@
 package com.tripapplicationf.tripapplicationf;
 
-import com.tripapplicationf.tripapplicationf.layout.city.City;
-import com.tripapplicationf.tripapplicationf.layout.passengers.Passengers;
-import com.tripapplicationf.tripapplicationf.layout.route.AllRoutes;
-import com.tripapplicationf.tripapplicationf.layout.route.Trip;
-import com.tripapplicationf.tripapplicationf.layout.weather.CheckWeather;
-import com.vaadin.flow.component.UI;
+import com.tripapplicationf.tripapplicationf.client.WeatherTripApplicationClient;
+import com.tripapplicationf.tripapplicationf.domain.WeatherCodeDto;
+import com.tripapplicationf.tripapplicationf.domain.WeatherDto;
+import com.tripapplicationf.tripapplicationf.layout.basiclayout.BasicLayout;
 import com.vaadin.flow.component.accordion.Accordion;
-import com.vaadin.flow.component.applayout.AppLayout;
-import com.vaadin.flow.component.applayout.DrawerToggle;
 
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Span;
 
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.router.*;
-import com.vaadin.flow.theme.lumo.Lumo;
 
 
-@Route
+@Route(layout = BasicLayout.class)
 @PageTitle("Trip application || Vaadin")
-public class MainView extends AppLayout {
+public class MainView extends VerticalLayout {
 
-    public MainView(){
+    private WeatherTripApplicationClient weatherTripApplicationClient;
 
-        ThemeList themeList = UI.getCurrent().getElement().getThemeList();
-        themeList.set(Lumo.DARK, true);
+    public MainView(WeatherTripApplicationClient weatherTripApplicationClient){
+        this.weatherTripApplicationClient = weatherTripApplicationClient;
+        welcome();
+        aboutCreator();
 
-        createHeader();
-        createDrawer();
     }
 
-    private void createDrawer() {
+    private void welcome(){
+        Span hello = new Span("Hello on My Trip application!");
+        Span currentWeather = new Span("Current weather for Warsaw - Poland is: ");
+        VerticalLayout welcome = new VerticalLayout();
+        welcome.add(hello, currentWeather, weatherInCityBase());
+        welcome.setAlignItems(Alignment.CENTER);
+        add(welcome);
+    }
 
+    private Div weatherInCityBase(){
+        WeatherDto weather = weatherTripApplicationClient.getWeatherInCityBase(52.23074, 20.9659);
+        WeatherCodeDto weatherCodeDto = weather.getWeatherCodeDto();
+
+        Span temp = new Span("Temperature: " + weather.getTemperature() + " \u2103");
+        Span windSpeed = new Span("Wind speed: " + weather.getWindspeed() + " km/h");
+        Span weatherDescription = new Span("Weather: " + weatherCodeDto.getDescription().toLowerCase());
+
+        Div div = new Div(
+                new VerticalLayout(temp, windSpeed, weatherDescription)
+        );
+
+        return div;
+    }
+
+    private void aboutCreator(){
         Accordion accordion = new Accordion();
 
-        VerticalLayout adminPanel = new VerticalLayout(
-                allRoutesPage(),
-                cityPage(),
-                passengers()
-        );
+        Span name = new Span("Piotr Tynek");
+        Span email = new Span("tynek.piotr@gmail.com");
 
-        addToDrawer(new VerticalLayout(
-                mainPage(),
-                tripPage(),
-                weatherPage(),
-                accordion.add("Admin panel", adminPanel)
-                )
-        );
-    }
+        VerticalLayout verticalLayout = new VerticalLayout(name, email);
+        verticalLayout.setPadding(false);
+        verticalLayout.setSpacing(false);
 
-    private HorizontalLayout cityPage() {
-        RouterLink cityLink = new RouterLink("Cities", City.class);
-        Icon cityIcon = new Icon(VaadinIcon.BUILDING);
-        cityLink.getStyle().set("margin-left", "5px");
-        HorizontalLayout cityPage = new HorizontalLayout(cityIcon, cityLink);
-        return cityPage;
-    }
+        accordion.add("About creator", verticalLayout);
+        accordion.close();
+        accordion.getStyle().set("position", "absolute").set("top", "85%").set("right", "1%");
+        add(accordion);
 
-    private HorizontalLayout allRoutesPage() {
-        RouterLink allRoutesLink = new RouterLink("All routes", AllRoutes.class);
-        Icon allRouterIcon = new Icon(VaadinIcon.LIST);
-        allRouterIcon.getStyle().set("margin-left", "5px");
-        HorizontalLayout routesPage =  new HorizontalLayout(allRouterIcon, allRoutesLink);
-        return routesPage;
-    }
-
-    private HorizontalLayout weatherPage() {
-        RouterLink weather = new RouterLink("Weather", CheckWeather.class);
-        Icon weatherIcon = new Icon(VaadinIcon.CLOUD_O);
-        weatherIcon.getStyle().set("margin-left", "3px");
-        HorizontalLayout weatherPage = new HorizontalLayout(weatherIcon, weather);
-        return weatherPage;
-    }
-
-    private HorizontalLayout tripPage() {
-        RouterLink tripLink = new RouterLink("Trip", Trip.class);
-        Icon tripIcon = new Icon(VaadinIcon.CAR);
-        tripIcon.getStyle().set("margin-left", "3px");
-        HorizontalLayout tripPage = new HorizontalLayout(tripIcon, tripLink);
-        return tripPage;
-    }
-
-    private HorizontalLayout mainPage() {
-        RouterLink mainView = new RouterLink("Home page", MainView.class);
-        Icon mainViewIcon = new Icon(VaadinIcon.HOME);
-        mainViewIcon.getStyle().set("margin-left", "3px");
-        HorizontalLayout mainPage =  new HorizontalLayout(mainViewIcon, mainView);
-        return mainPage;
-    }
-
-    private HorizontalLayout passengers() {
-        RouterLink passengersLink = new RouterLink("Passengers", Passengers.class);
-        Icon passengersIcon = new Icon(VaadinIcon.GROUP);
-        passengersLink.getStyle().set("margin-left", "5px");
-        HorizontalLayout passengers = new HorizontalLayout(passengersIcon, passengersLink);
-        return passengers;
     }
 
 
-    private void createHeader() {
-
-        H1 title = new H1("Trip Application");
-        title.getStyle().set("font-size", "var(--lumo-font-size-l)")
-                .set("margin", "0");
-
-        DrawerToggle drawer = new DrawerToggle();
-
-        HorizontalLayout header = new HorizontalLayout(drawer, title);
-        header.addClassName("header");
-        header.setWidth("100%");
-        header.setDefaultVerticalComponentAlignment(FlexComponent.Alignment.CENTER);
-
-        addToNavbar(header);
-    }
 }

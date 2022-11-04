@@ -14,5 +14,5 @@ public class WeatherDto {
     private long id;
     private double temperature;
     private double windspeed;
-    private int weathercode;
+    private WeatherCodeDto weatherCodeDto;
 }

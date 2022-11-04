@@ -1,13 +1,14 @@
 package com.tripapplicationf.tripapplicationf.layout.route;
 
 import com.tripapplicationf.tripapplicationf.MainView;
+import com.tripapplicationf.tripapplicationf.layout.basiclayout.BasicLayout;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
-@Route(value = "/routes", layout = MainView.class)
+@Route(value = "/routes", layout = BasicLayout.class)
 @PageTitle("All routes || Vaadin")
 public class AllRoutes extends VerticalLayout {
     public AllRoutes(){
