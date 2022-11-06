@@ -41,12 +41,35 @@ public class Passengers extends VerticalLayout {
         List<PassengersDto> list = client.getPassengers();
         Grid<PassengersDto> grid = new Grid<>();
 
-        grid.addColumn(PassengersDto::getId).setHeader("ID").setAutoWidth(true);
-        grid.addColumn(PassengersDto::getFirstName).setHeader("First name").setAutoWidth(true);
-        grid.addColumn(PassengersDto::getLastName).setHeader("Last name").setAutoWidth(true);
-        grid.addColumn(PassengersDto::getPhoneNumber).setHeader("Phone number").setAutoWidth(true);
-        grid.addColumn(PassengersDto::getMail).setHeader("Mail").setAutoWidth(true);
-        grid.addColumn(PassengersDto::isActive).setHeader("Active").setAutoWidth(true);
+        grid.addColumn(PassengersDto::getId)
+                .setHeader("ID")
+                .setAutoWidth(true)
+                .setSortable(true);
+
+        grid.addColumn(PassengersDto::getFirstName)
+                .setHeader("First name")
+                .setAutoWidth(true)
+                .setSortable(true);
+
+        grid.addColumn(PassengersDto::getLastName)
+                .setHeader("Last name")
+                .setAutoWidth(true)
+                .setSortable(true);
+
+        grid.addColumn(PassengersDto::getPhoneNumber)
+                .setHeader("Phone number")
+                .setAutoWidth(true)
+                .setSortable(true);
+
+        grid.addColumn(PassengersDto::getMail)
+                .setHeader("Mail")
+                .setAutoWidth(true)
+                .setSortable(true);
+
+        grid.addColumn(PassengersDto::isActive)
+                .setHeader("Active")
+                .setAutoWidth(true)
+                .setSortable(true);
 
         grid.setItems(list);
 
@@ -76,8 +99,12 @@ public class Passengers extends VerticalLayout {
         Button changeStatusButton = new Button(
                 "Change status",
                 event -> {
-                    client.changePassengerStatus(passengersComboBox.getValue().getId());
-                    UI.getCurrent().getPage().reload();
+                    if(!passengersComboBox.isEmpty()) {
+                        client.changePassengerStatus(passengersComboBox.getValue().getId());
+                        UI.getCurrent().getPage().reload();
+                    } else {
+                        Notification.show("Please, select passenger!", 2000, Notification.Position.MIDDLE);
+                    }
                 }
         );
 

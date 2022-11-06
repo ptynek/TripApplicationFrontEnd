@@ -1,10 +1,13 @@
 package com.tripapplicationf.tripapplicationf.domain;
 
+import com.vaadin.flow.shared.Registration;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import lombok.Setter;
 
 @Data
+@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class PassengersDto {

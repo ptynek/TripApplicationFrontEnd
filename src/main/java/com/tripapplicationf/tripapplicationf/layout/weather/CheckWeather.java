@@ -15,15 +15,19 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import lombok.Getter;
+import lombok.Setter;
 
 import java.util.List;
-
+@Getter
+@Setter
 @Route(value = "/weather", layout = BasicLayout.class)
 @PageTitle("Check weather || Vaadin")
 public class CheckWeather extends VerticalLayout {
 
     private CitiesTripApplicationClient client;
     private WeatherTripApplicationClient weatherClient;
+    private CitiesDto cityDto;
 
     public CheckWeather(CitiesTripApplicationClient client, WeatherTripApplicationClient weatherClient) {
         this.client = client;
@@ -31,53 +35,69 @@ public class CheckWeather extends VerticalLayout {
 
         setAlignItems(Alignment.CENTER);
 
-        add(
-                createSelect()
-        );
+        add(citiesComboBox(), getCityWeather());
+
     }
 
-    public ComboBox<CitiesDto> createSelect() {
-        List<CitiesDto> citiesList = client.getCitiesDto();
-        ComboBox<CitiesDto> selectCity = new ComboBox<>();
-        selectCity.setLabel("Select city");
-        selectCity.setItems(citiesList);
-        selectCity.setItemLabelGenerator(CitiesDto::getCity);
+    private ComboBox<CitiesDto> citiesComboBox(){
 
-        add(createCheckButton());
+        ComboBox<CitiesDto> citiesComboBox = new ComboBox<>();
+        citiesComboBox.setItems(client.getCitiesDto());
+        citiesComboBox.setItemLabelGenerator(CitiesDto::getCity);
+        citiesComboBox.setLabel("Select city");
+        citiesComboBox.addValueChangeListener(event ->
+                setCityDto(client.getCity(citiesComboBox.getValue().getId())));
 
-        return selectCity;
+        return citiesComboBox;
     }
 
-    private static Button createCheckButton() {
-            Button checkButton = new Button("Check weather",
-                    event -> createDialog().open());
+    private Dialog resultDialog(){
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Weather in " + getCityDto().getCity());
 
-        return checkButton;
-    }
+        VerticalLayout dialogLayout = dialogLayout(getWeather(getCityDto().getId()));
+        dialog.add(dialogLayout);
 
-     private static Dialog createDialog() {
-
-        VerticalLayout dialogLayout = new VerticalLayout();
-
-        Span temp = new Span("Temperature: " );
-        Span windSpeed = new Span("Windspeed: ");
-        Span weatherDescription = new Span("Weather: ");
-
-        Dialog dialog = new Dialog(new VerticalLayout(
-                 temp,
-                 windSpeed,
-                 weatherDescription
-        ));
-        dialog.setHeaderTitle("Weather in ");
-
-        Button closeButton = new Button("Close", event -> dialog.close());
-
-        dialogLayout.add(
-                dialog,
-                closeButton
-        );
-
+        Button okButton = createOkButton(dialog);
+        dialog.getFooter().add(okButton);
+        dialog.setWidth("350px");
         return dialog;
-     }
+    }
+
+    private Button createOkButton(Dialog dialog) {
+        Button okButton = new Button(
+                "Close",
+                event -> {
+                    dialog.close();
+                });
+        return okButton;
+    }
+
+    private WeatherDto getWeather(final long cityId){
+        WeatherDto weather = weatherClient.checkWeatherInChosenCity(cityId);
+        return weather;
+    }
+
+    private VerticalLayout dialogLayout(final WeatherDto weatherDto){
+
+        Span temp = new Span("Temperature: " + weatherDto.getTemperature());
+        Span windSpeed = new Span("Wind speed: " + weatherDto.getWindspeed());
+        Span weather = new Span(weatherDto.getWeatherCodeDto().getDescription());
+
+        VerticalLayout dialogLayout = new VerticalLayout(temp, windSpeed, weather);
+
+        return dialogLayout;
+    }
+
+    private Button getCityWeather(){
+        Button getWeather = new Button(
+                "Get weather",
+                event -> {
+                    resultDialog().open();
+                }
+                );
+        return getWeather;
+    }
+
 
 }

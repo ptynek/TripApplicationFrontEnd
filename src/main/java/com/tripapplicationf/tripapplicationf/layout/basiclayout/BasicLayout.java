@@ -10,6 +10,7 @@ import com.tripapplicationf.tripapplicationf.layout.route.AllRoutes;
 import com.tripapplicationf.tripapplicationf.layout.route.Trip;
 import com.tripapplicationf.tripapplicationf.layout.weather.CheckWeather;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.HasValue;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.applayout.AppLayout;
@@ -25,13 +26,27 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.theme.lumo.Lumo;
+import lombok.Getter;
+import lombok.Setter;
+import lombok.Value;
+
 
 public class BasicLayout extends AppLayout {
 
     private PassengersTripApplicationClient client;
+    private PassengersDto passengerDto;
+
+    public PassengersDto getPassengerDto() {
+        return passengerDto;
+    }
+
+    public void setPassengerDto(PassengersDto passengerDto) {
+        this.passengerDto = passengerDto;
+    }
 
     public BasicLayout(PassengersTripApplicationClient client) {
         this.client = client;
@@ -129,11 +144,83 @@ public class BasicLayout extends AppLayout {
         addToNavbar(header);
     }
 
+    //add passsenger sector
+
+    private Dialog addPassenger(){
+
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Add new passenger");
+
+        VerticalLayout passengerDialogLayout = createNewPassengerDialogLayout();
+        dialog.add(passengerDialogLayout);
+
+        Button addPassengerButton = addPassengerButton(dialog);
+        Button cancelButton = createCancelButton(dialog);
+        dialog.getFooter().add(cancelButton);
+        dialog.getFooter().add(addPassengerButton);
+        dialog.setWidth("430px");
+        dialog.setHeight("470px");
+
+        return dialog;
+    }
+
+    private Button createCancelButton(Dialog dialog) {
+        Button cancelButton = new Button(
+                "Cancel",
+                event -> dialog.close()
+        );
+        cancelButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+
+        return cancelButton;
+    }
+
+    private Button addPassengerButton(final Dialog dialog) {
+        Button addPassengerButton = new Button(
+                "Create passenger",
+                event -> {
+                        client.createPassenger(getPassengerDto());
+                        dialog.close();
+                        UI.getCurrent().getPage().reload();
+                }
+                );
+        return addPassengerButton;
+    }
+
+    private VerticalLayout createNewPassengerDialogLayout() {
+
+        TextField firstName = new TextField("First name");
+        TextField lastName = new TextField("Last name");
+        TextField phoneNumber = new TextField("Phone number");
+        TextField mail = new TextField("e-Mail");
+
+        setPassengerDto(new PassengersDto(
+                firstName.addValueChangeListener(event ->
+                        getPassengerDto().setFirstName(event.getValue())).toString(),
+                lastName.addValueChangeListener(event ->
+                        getPassengerDto().setLastName(event.getValue())).toString(),
+                phoneNumber.addValueChangeListener(event ->
+                        getPassengerDto().setPhoneNumber(event.getValue())).toString(),
+                mail.addValueChangeListener(event ->
+                        getPassengerDto().setMail(event.getValue())).toString()));
+
+        VerticalLayout passengerDialogLayout = new VerticalLayout(
+                firstName,
+                lastName,
+                phoneNumber,
+                mail
+        );
+        passengerDialogLayout.setPadding(false);
+        passengerDialogLayout.setSpacing(false);
+        passengerDialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
+
+        return passengerDialogLayout;
+    }
+
     private HorizontalLayout newPassengerLayout(){
 
         Button newPassengerButton = new Button(
                 "New passenger",
-                event -> newPassengerDialog().open()
+                event -> addPassenger().open()
                 );
 
         HorizontalLayout newPassengerLayout = new HorizontalLayout(newPassengerButton);
@@ -141,41 +228,4 @@ public class BasicLayout extends AppLayout {
         newPassengerButton.addThemeVariants(ButtonVariant.LUMO_SMALL);
         return newPassengerLayout;
     }
-
-    private Dialog newPassengerDialog(){
-        Dialog dialog = new Dialog();
-        dialog.setHeaderTitle("New passenger");
-
-        TextField firstName = new TextField("First name");
-        TextField lastName = new TextField("Last name");
-        TextField phoneNumber = new TextField("Phone number");
-        TextField mail = new TextField("e-Mail");
-
-        VerticalLayout dialogLayout = new VerticalLayout(firstName, lastName, phoneNumber, mail);
-        dialogLayout.setPadding(false);
-        dialogLayout.setSpacing(false);
-        dialogLayout.setAlignItems(FlexComponent.Alignment.STRETCH);
-
-        Button addPassengerButton = new Button("New passenger" , event -> {
-            client.createPassenger(
-                    new PassengersDto(
-                            firstName.getValue(),
-                            lastName.getValue(),
-                            phoneNumber.getValue(),
-                            mail.getValue()));
-            dialog.close();
-            UI.getCurrent().getPage().reload();
-        });
-
-        Button cancelButton = new Button("Cancel", event -> dialog.close());
-        cancelButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
-        dialog.getFooter().add(cancelButton);
-        dialog.getFooter().add(addPassengerButton);
-        dialog.setWidth("430px");
-        dialog.setHeight("470px");
-        dialog.add(dialogLayout);
-
-        return dialog;
-    }
-
 }

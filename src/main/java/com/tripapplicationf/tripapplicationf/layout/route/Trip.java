@@ -1,10 +1,7 @@
 package com.tripapplicationf.tripapplicationf.layout.route;
 
-import com.tripapplicationf.tripapplicationf.MainView;
 import com.tripapplicationf.tripapplicationf.layout.basiclayout.BasicLayout;
-import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;

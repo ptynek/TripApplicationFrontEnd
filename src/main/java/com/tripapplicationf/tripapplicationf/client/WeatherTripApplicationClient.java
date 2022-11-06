@@ -20,9 +20,9 @@ public class WeatherTripApplicationClient {
         return weatherDto;
     }
 
-    public WeatherDto checkWeatherInChoosenCity(final long idCity) {
-        WeatherDto weather = restTemplate.getForObject(ENDPOINT_ADRESS + "", WeatherDto.class, idCity);
+    public WeatherDto checkWeatherInChosenCity(final long idCity) {
 
+        WeatherDto weather = restTemplate.getForObject(ENDPOINT_ADRESS + "weather/" + idCity, WeatherDto.class, idCity);
 
         return weather;
     }
