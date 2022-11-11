@@ -1,13 +1,11 @@
 package com.tripapplicationf.tripapplicationf.domain;
 
-import com.vaadin.flow.shared.Registration;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 @Data
-@Setter
 @AllArgsConstructor
 @NoArgsConstructor
 public class PassengersDto {
@@ -18,6 +16,7 @@ public class PassengersDto {
     private String phoneNumber;
     private String mail;
     private boolean active;
+    private boolean loggedIn;
 
     public boolean isActive() {
         return active;
@@ -27,8 +26,17 @@ public class PassengersDto {
         this.active = active;
     }
 
-    public String getPassengerForCombobox() {
+    public boolean isLoggedIn() {
+        return loggedIn;
+    }
+
+    public String getPassengerForAdminCombobox() {
             String result = id + ".    " + firstName + " " + lastName;
+        return result;
+    }
+
+    public String getPassengerForCombobox() {
+        String result = firstName + " " + lastName;
         return result;
     }
 

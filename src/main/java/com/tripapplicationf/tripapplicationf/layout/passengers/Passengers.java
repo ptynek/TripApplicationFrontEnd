@@ -18,8 +18,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 
 import java.util.List;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Route(value = "/passengers", layout = BasicLayout.class)
 @PageTitle("Passengers || Vaadin")
@@ -31,12 +29,12 @@ public class Passengers extends VerticalLayout {
         this.client = client;
         add(
             menuBar(),
-            buildGrid()
+            createPassengersGrid()
         );
 
     }
 
-    private Grid buildGrid(){
+    private Grid createPassengersGrid(){
 
         List<PassengersDto> list = client.getPassengers();
         Grid<PassengersDto> grid = new Grid<>();
@@ -72,6 +70,7 @@ public class Passengers extends VerticalLayout {
                 .setSortable(true);
 
         grid.setItems(list);
+        grid.setAllRowsVisible(true);
 
         return grid;
     }
@@ -93,7 +92,7 @@ public class Passengers extends VerticalLayout {
         List<PassengersDto> passengersList = client.getPassengers();
 
         passengersComboBox.setItems(passengersList);
-        passengersComboBox.setItemLabelGenerator(PassengersDto::getPassengerForCombobox);
+        passengersComboBox.setItemLabelGenerator(PassengersDto::getPassengerForAdminCombobox);
         passengersComboBox.setWidth("250px");
 
         Button changeStatusButton = new Button(

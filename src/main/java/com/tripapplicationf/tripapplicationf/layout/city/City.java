@@ -13,29 +13,27 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import lombok.Getter;
-import lombok.Setter;
+import lombok.Data;
 
 import java.util.List;
 
-@Getter
-@Setter
+@Data
 @Route(value = "/city", layout = BasicLayout.class)
 @PageTitle("Cities || Vaadin")
 public class City extends VerticalLayout {
 
     private CitiesTripApplicationClient client;
     private long cityId;
-    private String cityName;
-    private String country;
-    private double latitude;
-    private double longitude;
+    private CitiesDto citiesDto;
+    private boolean validationNumberFields = false;
+    private boolean validationTextFields = false;
 
     public City(CitiesTripApplicationClient client) {
         this.client = client;
@@ -58,6 +56,8 @@ public class City extends VerticalLayout {
         grid.addColumn(CitiesDto::isActive).setHeader("Status (active)").setAutoWidth(true).setSortable(true);
 
         grid.setItems(list);
+        grid.setAllRowsVisible(true);
+
         return grid;
     }
 
@@ -103,10 +103,18 @@ public class City extends VerticalLayout {
         longitudeNf.setPlaceholder("xx.xxxxx");
         longitudeNf.getStyle().set("position", "absolute").set("right", "6%");
 
-        city.addValueChangeListener(event -> setCityName(event.getValue()));
-        country.addValueChangeListener(event -> setCountry(event.getValue()));
-        latitudeNf.addValueChangeListener(event -> setLatitude(event.getValue()));
-        longitudeNf.addValueChangeListener(event -> setLongitude(event.getValue()));
+        if(checkValueOfTextFields(city, country) && checkValueOfNumberFields(latitudeNf, longitudeNf)) {
+            setCitiesDto(new CitiesDto(
+                    city.addValueChangeListener(event ->
+                            getCitiesDto().setCity(event.getValue())).toString(),
+                    country.addValueChangeListener(event ->
+                            getCitiesDto().setCountry(event.getValue())).toString(),
+                    latitudeNf.addValueChangeListener(event ->
+                            getCitiesDto().setLatitude(event.getValue())),
+                    longitudeNf.addValueChangeListener(event ->
+                            getCitiesDto().setLongitude(event.getValue()))
+            ));
+        }
 
         VerticalLayout dialogLayout = new VerticalLayout(city, country, new HorizontalLayout(latitudeNf, longitudeNf));
         dialogLayout.setPadding(false);
@@ -120,22 +128,20 @@ public class City extends VerticalLayout {
 
         Button addCityButton = new Button(
                 "Add city",
-                event -> {client.addCity(
-                        new CitiesDto(
-                                cityName,
-                                country,
-                                latitude,
-                                longitude
-                        )
-                );
-                    dialog.close();
-                    UI.getCurrent().getPage().reload();
+                event -> {
+                    if(validationNumberFields && validationTextFields) {
+                        client.addCity(getCitiesDto());
+                        dialog.close();
+                        UI.getCurrent().getPage().reload();
+                    } else {
+                        Notification notification = Notification.show("Please fill out all fields", 2000, Notification.Position.MIDDLE);
+                        notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                    }
                 }
         );
 
         return addCityButton;
     }
-
 
     //Change city status sector
     private Dialog changeStatusOfCityDialog(){
@@ -206,6 +212,26 @@ public class City extends VerticalLayout {
         cancelButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
 
         return cancelButton;
+    }
+
+    private boolean checkValueOfNumberFields(NumberField... numberFields){
+        for(NumberField field:numberFields){
+            if (field.getValue().equals("") || field.getValue().equals(null)){
+                return false;
+            }
+        }
+        setValidationNumberFields(true);
+        return true;
+    }
+
+    private boolean checkValueOfTextFields(TextField... textFields){
+        for(TextField field:textFields){
+            if (field.getValue().equals("") || field.getValue().equals(null)){
+                return false;
+            }
+        }
+        setValidationTextFields(true);
+        return true ;
     }
 
 }

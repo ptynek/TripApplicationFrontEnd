@@ -3,6 +3,7 @@ package com.tripapplicationf.tripapplicationf.client;
 import com.tripapplicationf.tripapplicationf.domain.PassengersDto;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpMethod;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
@@ -20,7 +21,8 @@ import java.util.Optional;
 public class PassengersTripApplicationClient {
 
     private final RestTemplate restTemplate;
-    private final static String ENDPOINT_ADRESS = "http://localhost:8080/v1/";
+    @Value("${app.api.endpoint}")
+    private String ENDPOINT_ADRESS;
 
     public List<PassengersDto> getPassengers() {
         URI url = UriComponentsBuilder.fromHttpUrl(ENDPOINT_ADRESS + "passengers")
@@ -64,6 +66,13 @@ public class PassengersTripApplicationClient {
                 ENDPOINT_ADRESS + "passengers",
                 passengersDto,
                 PassengersDto.class
+        );
+    }
+
+    public void logInPassenger(final long passengerId){
+        restTemplate.put(
+                ENDPOINT_ADRESS + "passengerlogin/" + passengerId,
+                    passengerId
         );
     }
 }

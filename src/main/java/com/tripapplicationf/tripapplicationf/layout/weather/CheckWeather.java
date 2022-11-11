@@ -1,6 +1,5 @@
 package com.tripapplicationf.tripapplicationf.layout.weather;
 
-import com.tripapplicationf.tripapplicationf.MainView;
 import com.tripapplicationf.tripapplicationf.client.CitiesTripApplicationClient;
 import com.tripapplicationf.tripapplicationf.client.WeatherTripApplicationClient;
 import com.tripapplicationf.tripapplicationf.domain.CitiesDto;
@@ -11,14 +10,16 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
+import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import lombok.Getter;
 import lombok.Setter;
 
 import java.util.List;
+import java.util.stream.Collectors;
+
 @Getter
 @Setter
 @Route(value = "/weather", layout = BasicLayout.class)
@@ -28,6 +29,7 @@ public class CheckWeather extends VerticalLayout {
     private CitiesTripApplicationClient client;
     private WeatherTripApplicationClient weatherClient;
     private CitiesDto cityDto;
+    private boolean valueOfComboBox = false;
 
     public CheckWeather(CitiesTripApplicationClient client, WeatherTripApplicationClient weatherClient) {
         this.client = client;
@@ -42,11 +44,20 @@ public class CheckWeather extends VerticalLayout {
     private ComboBox<CitiesDto> citiesComboBox(){
 
         ComboBox<CitiesDto> citiesComboBox = new ComboBox<>();
-        citiesComboBox.setItems(client.getCitiesDto());
+        List<CitiesDto> citiesList = client.getCitiesDto().stream()
+                                .filter(CitiesDto::isActive)
+                                .collect(Collectors.toList());
+        citiesComboBox.setItems(citiesList);
         citiesComboBox.setItemLabelGenerator(CitiesDto::getCity);
         citiesComboBox.setLabel("Select city");
-        citiesComboBox.addValueChangeListener(event ->
-                setCityDto(client.getCity(citiesComboBox.getValue().getId())));
+        citiesComboBox.isRequired();
+        citiesComboBox.addValueChangeListener(event -> {
+                    if(!event.getValue().equals("") || !event.getValue().equals(null)){
+                        setValueOfComboBox(true);
+                        setCityDto(client.getCity(event.getValue().getId()));
+                    }
+                }
+            );
 
         return citiesComboBox;
     }
@@ -58,13 +69,13 @@ public class CheckWeather extends VerticalLayout {
         VerticalLayout dialogLayout = dialogLayout(getWeather(getCityDto().getId()));
         dialog.add(dialogLayout);
 
-        Button okButton = createOkButton(dialog);
+        Button okButton = createCloseButton(dialog);
         dialog.getFooter().add(okButton);
         dialog.setWidth("350px");
         return dialog;
     }
 
-    private Button createOkButton(Dialog dialog) {
+    private Button createCloseButton(Dialog dialog) {
         Button okButton = new Button(
                 "Close",
                 event -> {
@@ -80,8 +91,8 @@ public class CheckWeather extends VerticalLayout {
 
     private VerticalLayout dialogLayout(final WeatherDto weatherDto){
 
-        Span temp = new Span("Temperature: " + weatherDto.getTemperature());
-        Span windSpeed = new Span("Wind speed: " + weatherDto.getWindspeed());
+        Span temp = new Span("Temperature: " + weatherDto.getTemperature() + " \u2103");
+        Span windSpeed = new Span("Wind speed: " + weatherDto.getWindspeed() + " km/h");
         Span weather = new Span(weatherDto.getWeatherCodeDto().getDescription());
 
         VerticalLayout dialogLayout = new VerticalLayout(temp, windSpeed, weather);
@@ -93,11 +104,14 @@ public class CheckWeather extends VerticalLayout {
         Button getWeather = new Button(
                 "Get weather",
                 event -> {
-                    resultDialog().open();
+                    if(!valueOfComboBox) {
+                        Notification notification = Notification.show("Please, select city!", 2000, Notification.Position.MIDDLE);
+                        notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
+                    } else {
+                        resultDialog().open();
+                    }
                 }
                 );
         return getWeather;
     }
-
-
 }

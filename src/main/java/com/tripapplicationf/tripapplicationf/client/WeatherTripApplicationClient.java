@@ -2,6 +2,7 @@ package com.tripapplicationf.tripapplicationf.client;
 
 import com.tripapplicationf.tripapplicationf.domain.WeatherDto;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 
@@ -10,7 +11,8 @@ import org.springframework.web.client.RestTemplate;
 public class WeatherTripApplicationClient {
 
     private final RestTemplate restTemplate;
-    private final static String ENDPOINT_ADRESS = "http://localhost:8080/v1/";
+    @Value("${app.api.endpoint}")
+    private String ENDPOINT_ADRESS;
 
 
     public WeatherDto getWeatherInCityBase(final double lat, final double lon){

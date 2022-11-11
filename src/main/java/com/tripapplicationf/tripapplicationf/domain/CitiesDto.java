@@ -1,5 +1,6 @@
 package com.tripapplicationf.tripapplicationf.domain;
 
+import com.vaadin.flow.shared.Registration;
 import lombok.*;
 
 @Getter
@@ -21,5 +22,8 @@ public class CitiesDto {
         this.country = country;
         this.latitude = latitude;
         this.longitude = longitude;
+    }
+
+    public CitiesDto(String city, String country, Registration addValueChangeListener, Registration addValueChangeListener1) {
     }
 }
