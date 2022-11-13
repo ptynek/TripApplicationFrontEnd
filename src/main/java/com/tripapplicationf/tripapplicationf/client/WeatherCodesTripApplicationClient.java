@@ -1,7 +1,6 @@
 package com.tripapplicationf.tripapplicationf.client;
 
 import com.tripapplicationf.tripapplicationf.domain.WeatherCodeDto;
-import jdk.nashorn.internal.runtime.regexp.joni.constants.RegexState;
 import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;

@@ -1,8 +1,6 @@
 package com.tripapplicationf.tripapplicationf.client;
 
-import com.tripapplicationf.tripapplicationf.domain.PriceSettingsDto;
 import com.tripapplicationf.tripapplicationf.domain.RouteDto;
-import jdk.vm.ci.meta.Local;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,10 +9,7 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.math.BigDecimal;
 import java.net.URI;
-import java.sql.Date;
-import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.Collections;
