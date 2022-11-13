@@ -34,7 +34,10 @@ import com.vaadin.flow.theme.lumo.Lumo;
 import lombok.Getter;
 import lombok.Setter;
 
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Getter
@@ -43,7 +46,7 @@ public class BasicLayout extends AppLayout {
 
     private PassengersTripApplicationClient client;
     private PassengersDto passengerDto;
-    private boolean checkValueOfTextFields = false;
+
 
     public BasicLayout(PassengersTripApplicationClient client) {
         this.client = client;
@@ -88,15 +91,14 @@ public class BasicLayout extends AppLayout {
 
     private ComboBox<PassengersDto> createSelectPassengersComboBox() {
 
-        List<PassengersDto> passengersList = client.getPassengers().stream()
-                .filter(PassengersDto::isActive)
-                .collect(Collectors.toList());
-
         ComboBox<PassengersDto> passengersComboBox = new ComboBox<>();
-        passengersComboBox.setItems(passengersList);
+        passengersComboBox.setItems(Optional.ofNullable(
+                    client.getPassengers().stream()
+                    .filter(PassengersDto::isActive)
+                    .collect(Collectors.toList()))
+                .orElse(Collections.emptyList()));
         passengersComboBox.setItemLabelGenerator(PassengersDto::getPassengerForCombobox);
         passengersComboBox.setLabel("Select passenger");
-        passengersComboBox.setPlaceholder(findPassengerCurrentlyLoggedIn(passengersList).get(0).getPassengerForCombobox());
         passengersComboBox.getStyle().set("position", "absolute").set("bottom", "5%");
 
         passengersComboBox.addValueChangeListener(
@@ -222,14 +224,9 @@ public class BasicLayout extends AppLayout {
         Button addPassengerButton = new Button(
                 "Create passenger",
                 event -> {
-                    if(checkValueOfTextFields) {
                         client.createPassenger(getPassengerDto());
                         dialog.close();
                         UI.getCurrent().getPage().reload();
-                    } else  {
-                        Notification notification = Notification.show("Please fill out all fields!", 2000, Notification.Position.MIDDLE);
-                        notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-                    }
                 }
                 );
         return addPassengerButton;
@@ -242,8 +239,7 @@ public class BasicLayout extends AppLayout {
         TextField phoneNumber = new TextField("Phone number");
         TextField mail = new TextField("e-Mail");
 
-        if (checkValueOfTextFieldsMethod(firstName, lastName, phoneNumber, mail)){
-            setPassengerDto(new PassengersDto(
+        setPassengerDto(new PassengersDto(
                     firstName.addValueChangeListener(event ->
                             getPassengerDto().setFirstName(event.getValue())).toString(),
                     lastName.addValueChangeListener(event ->
@@ -252,7 +248,7 @@ public class BasicLayout extends AppLayout {
                             getPassengerDto().setPhoneNumber(event.getValue())).toString(),
                     mail.addValueChangeListener(event ->
                             getPassengerDto().setMail(event.getValue())).toString()));
-        }
+
 
         VerticalLayout passengerDialogLayout = new VerticalLayout(
                 firstName,
@@ -280,14 +276,4 @@ public class BasicLayout extends AppLayout {
         return newPassengerLayout;
     }
 
-    public boolean checkValueOfTextFieldsMethod(TextField... fields){
-
-        for(TextField field: fields){
-            if (field.getValue().equals("") || field.getValue().equals(null)) {
-                return false;
-            }
-        }
-        setCheckValueOfTextFields(true);
-        return true;
-    }
 }

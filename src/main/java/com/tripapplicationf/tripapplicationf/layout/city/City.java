@@ -103,8 +103,7 @@ public class City extends VerticalLayout {
         longitudeNf.setPlaceholder("xx.xxxxx");
         longitudeNf.getStyle().set("position", "absolute").set("right", "6%");
 
-        if(checkValueOfTextFields(city, country) && checkValueOfNumberFields(latitudeNf, longitudeNf)) {
-            setCitiesDto(new CitiesDto(
+        setCitiesDto(new CitiesDto(
                     city.addValueChangeListener(event ->
                             getCitiesDto().setCity(event.getValue())).toString(),
                     country.addValueChangeListener(event ->
@@ -113,8 +112,7 @@ public class City extends VerticalLayout {
                             getCitiesDto().setLatitude(event.getValue())),
                     longitudeNf.addValueChangeListener(event ->
                             getCitiesDto().setLongitude(event.getValue()))
-            ));
-        }
+        ));
 
         VerticalLayout dialogLayout = new VerticalLayout(city, country, new HorizontalLayout(latitudeNf, longitudeNf));
         dialogLayout.setPadding(false);
@@ -129,14 +127,9 @@ public class City extends VerticalLayout {
         Button addCityButton = new Button(
                 "Add city",
                 event -> {
-                    if(validationNumberFields && validationTextFields) {
                         client.addCity(getCitiesDto());
                         dialog.close();
                         UI.getCurrent().getPage().reload();
-                    } else {
-                        Notification notification = Notification.show("Please fill out all fields", 2000, Notification.Position.MIDDLE);
-                        notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-                    }
                 }
         );
 
@@ -212,26 +205,6 @@ public class City extends VerticalLayout {
         cancelButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
 
         return cancelButton;
-    }
-
-    private boolean checkValueOfNumberFields(NumberField... numberFields){
-        for(NumberField field:numberFields){
-            if (field.getValue().equals("") || field.getValue().equals(null)){
-                return false;
-            }
-        }
-        setValidationNumberFields(true);
-        return true;
-    }
-
-    private boolean checkValueOfTextFields(TextField... textFields){
-        for(TextField field:textFields){
-            if (field.getValue().equals("") || field.getValue().equals(null)){
-                return false;
-            }
-        }
-        setValidationTextFields(true);
-        return true ;
     }
 
 }

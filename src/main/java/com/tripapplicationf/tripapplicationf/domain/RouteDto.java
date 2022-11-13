@@ -28,6 +28,7 @@ public class RouteDto {
 
     private PassengersDto passengersDto;
     private LocalDateTime dateOfTrip;
+    private BigDecimal price;
 
 
     public String getStringDateOfTrip(){
